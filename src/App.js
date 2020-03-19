@@ -32,6 +32,44 @@ class App extends Component {
 
 		const results = this.state.data
 		const main = this.state.main
+		
+		const size = Object.keys(results).length
+		let states = {}	
+
+		for (let i=0; i < size; i++){
+			if (results[i].Province.split(", ")[1]) {
+				// Province is split between state & county.
+				let state = results[i].Province.split(", ")[1]
+
+				if (Object.keys(states).includes(stateTable[state])) {
+					states[stateTable[state]].push({
+						date: results[i].Date,
+						deaths: results[i].Cases
+					})
+				} else {
+					states[stateTable[state]] = []
+					states[stateTable[state]].push({
+						date: results[i].Date,
+						deaths: results[i].Cases
+					})
+				}
+			} else {
+				// Only state name is specified.
+				let state = results[i].Province
+				if (Object.keys(states).includes(state)) {
+					states[state].push({
+						date: results[i].Date,
+						deaths: results[i].Cases
+					})
+				} else {
+					states[state] = []
+					states[state].push({
+						date: results[i].Date,
+						deaths: results[i].Cases
+					})
+				}
+			}
+		}
 		debugger
 	}
 
