@@ -5,7 +5,8 @@ class App extends Component {
 	constructor() {
 		super();
 		this.state = {
-			data: {}
+			main: {},
+			in: "waiting"
 		}
 	}
 	componentDidMount() { this.getData(); }
@@ -15,8 +16,19 @@ class App extends Component {
 		fetch("https://api.covid19api.com/")
 			.then(resp => resp.json())
 			.then(json => {
-				this.setState({ data: {...json} })
+				this.setState({ main: {...json} })
 			})
+	}
+
+	showDownload = () => {
+		switch (this.state.in) {
+			case "waiting" :
+				return "waiting for data";
+			case "success" :
+				return "download complete";
+			case "failure":
+				return "download failed";
+		}
 	}
 
 	render() {
@@ -26,7 +38,7 @@ class App extends Component {
 					COVID-19
 				</header>
 				<main>
-
+					{this.showDownload()}
 				</main>
 			</div>
 		);
