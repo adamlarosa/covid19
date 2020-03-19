@@ -5,6 +5,7 @@ class App extends Component {
 	constructor() {
 		super();
 		this.state = {
+			data: {},
 			main: {},
 			in: "waiting"
 		}
@@ -12,6 +13,16 @@ class App extends Component {
 	componentDidMount() { this.getData(); }
 
 	getData = () => {
+	// Get List Of Cases Per Country Per Province By Case Type From The First Recorded Case
+		fetch("https://api.covid19api.com/dayone/country/us/status/deaths")
+		.then(resp => resp.json())
+		.then(json => {
+			if (json) {
+				this.setState({ data: {...json}, in: "success" })
+			} else {
+				this.setState({in: "failure"})
+			}
+		})
 	//root API
 		fetch("https://api.covid19api.com/")
 			.then(resp => resp.json())
@@ -28,6 +39,8 @@ class App extends Component {
 				return "download complete";
 			case "failure":
 				return "download failed";
+			default :
+				return "defaulting";
 		}
 	}
 
