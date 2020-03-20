@@ -7,10 +7,13 @@ class App extends Component {
 		this.state = {
 			data: {},
 			main: {},
-			in: "waiting"
+			in: "waiting",
+			dead: 0
 		}
 	}
-	componentDidMount() { this.getData(); }
+	componentDidMount() { 
+		this.getData();
+	}
 
 	accessData = () => {
 		const stateTable = {
@@ -32,30 +35,35 @@ class App extends Component {
 
 		const results = this.state.data
 		const main = this.state.main
+		let totalDeaths = 0
 		
-		const size = Object.keys(results).length
+		const resultsSize = Object.keys(results).length
 		let states = {}	
 
-		for (let i=0; i < size; i++){
+
+		for (let i=0; i < resultsSize; i++){
+			// Province is split between state & county.
 			if (results[i].Province.split(", ")[1]) {
-				// Province is split between state & county.
 				let state = results[i].Province.split(", ")[1]
 
 				if (Object.keys(states).includes(stateTable[state])) {
 					states[stateTable[state]].push({
+						location: results[i].Province.split(", ")[0],
 						date: results[i].Date,
 						deaths: results[i].Cases
 					})
 				} else {
 					states[stateTable[state]] = []
 					states[stateTable[state]].push({
+						location: results[i].Province.split(", ")[0],
 						date: results[i].Date,
 						deaths: results[i].Cases
 					})
 				}
 			} else {
-				// Only state name is specified.
+			// Only state name is specified.
 				let state = results[i].Province
+
 				if (Object.keys(states).includes(state)) {
 					states[state].push({
 						date: results[i].Date,
@@ -70,11 +78,25 @@ class App extends Component {
 				}
 			}
 		}
+
+
+		for (const state in states) {
+
+			const stateSize = states[state].length
+			const theDead = states[state][stateSize - 1].deaths
+			const theTime = states[state][stateSize -1].date
+
+			totalDeaths = totalDeaths + theDead
+			console.log(state, ":", theDead, theTime)
+		}
+		this.setState({dead: totalDeaths})
+		console.log("Total Deaths: ", totalDeaths)
 		debugger
 	}
 
 	getData = () => {
-	// Get List Of Cases Per Country Per Province By Case Type From The First Recorded Case
+	// Get List Of Cases Per Country Per Province By Case Type From The First 
+	// Recorded Case - status must be confirmed, recovered, or deaths
 		fetch("https://api.covid19api.com/dayone/country/us/status/deaths")
 		.then(resp => resp.json())
 		.then(json => {
@@ -105,11 +127,12 @@ class App extends Component {
 		}
 	}
 
+
 	render() {
 		return (
 			<div className="App">
 				<header className="App-header">
-					COVID-19
+					COVID-19 | {this.state.dead} American Fatalities
 				</header>
 				<main>
 					<button onClick={() => this.accessData()}>
@@ -118,7 +141,21 @@ class App extends Component {
 					
 					<br/>
 					
-					{this.showDownload()}
+					{this.showDownload()} 
+					
+					<br/><p/>
+
+					...but if even ten or fifteen percent of the population decides<br/> 
+					that what they're doing today is more important than the health<br/> 
+					and welfare of the rest of Americans, they can spread the<br/> 
+					virus in a very strong way because you know the level of contagion. 
+					<br/><p/>
+					- Dr. Deborah Birx<br/>White House Coronavirus Response Coordinator, 
+					3/19/20
+					<br/><p/>
+					<button onClick={() => console.log("NOT CONNECTED")}>
+						- ! -
+					</button>
 				</main>
 			</div>
 		);
