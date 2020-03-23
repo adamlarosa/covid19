@@ -8,7 +8,8 @@ class App extends Component {
 			data: {},
 			main: {},
 			in: "waiting",
-			dead: 0
+			dead: 0,
+			states : {}
 		}
 	}
 	componentDidMount() { 
@@ -34,18 +35,15 @@ class App extends Component {
 		}
 
 		const results = this.state.data
-		const main = this.state.main
 		let totalDeaths = 0
 		
 		const resultsSize = Object.keys(results).length
 		let states = {}	
 
-
 		for (let i=0; i < resultsSize; i++){
 			// Province is split between state & county.
 			if (results[i].Province.split(", ")[1]) {
 				let state = results[i].Province.split(", ")[1]
-
 				if (Object.keys(states).includes(stateTable[state])) {
 					states[stateTable[state]].push({
 						location: results[i].Province.split(", ")[0],
@@ -63,7 +61,6 @@ class App extends Component {
 			} else {
 			// Only state name is specified.
 				let state = results[i].Province
-
 				if (Object.keys(states).includes(state)) {
 					states[state].push({
 						date: results[i].Date,
@@ -79,20 +76,22 @@ class App extends Component {
 			}
 		}
 
+		this.setState({
+			states
+		})
 
 		for (const state in states) {
-
 			const stateSize = states[state].length
 			const theDead = states[state][stateSize - 1].deaths
-			const theTime = states[state][stateSize -1].date
+			const theTime = states[state][stateSize - 1].date
 
 			totalDeaths = totalDeaths + theDead
 			console.log(state, ":", theDead, theTime)
 		}
 		this.setState({dead: totalDeaths})
 		console.log("Total Deaths: ", totalDeaths)
-		debugger
-	}
+debugger
+	} // end of accessData()
 
 	getData = () => {
 	// Get List Of Cases Per Country Per Province By Case Type From The First 
@@ -127,6 +126,9 @@ class App extends Component {
 		}
 	}
 
+	showState = () => {
+		console.log(this.state)
+	}
 
 	render() {
 		return (
@@ -153,7 +155,7 @@ class App extends Component {
 					- Dr. Deborah Birx<br/>White House Coronavirus Response Coordinator, 
 					3/19/20
 					<br/><p/>
-					<button onClick={() => console.log("NOT CONNECTED")}>
+					<button onClick={() => this.showState()}>
 						- ! -
 					</button>
 				</main>
