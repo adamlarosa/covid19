@@ -9,14 +9,15 @@ class App extends Component {
 			main: {},
 			in: "waiting",
 			dead: 0,
-			states : {}
+			states : {},
+			countries: {}
 		}
 	}
 	componentDidMount() { 
 		this.getData();
 	}
 
-	accessData = () => {
+	processData = (initialObject) => {
 		const stateTable = {
 			AL: "Alabama", AK: "Alaska", AZ: "Arizona", AR: "Arkansas",
 			CA: "California", CO: "Colorado", CT: "Connecticut", DE: "Delaware",
@@ -32,54 +33,51 @@ class App extends Component {
 			SD: "South Dakota",	TN: "Tennessee", TX: "Texas", UT: "Utah", 
 			VT: "Vermont", VA: "Virginia", WA: "Washington", 
 			WV: "West Virginia", WI: "Wisconsin", WY: "Wyoming"	
-		}
+		};
 
-		const results = this.state.data
-		let totalDeaths = 0
-		
-		const resultsSize = Object.keys(results).length
-		let states = {}	
+		const resultsSize = Object.keys(initialObject).length;
+		let states = {};
 
 		for (let i=0; i < resultsSize; i++){
 			// Province is split between state & county.
-			if (results[i].Province.split(", ")[1]) {
-				let state = results[i].Province.split(", ")[1]
+			if (initialObject[i].Province.split(", ")[1]) {
+				let state = initialObject[i].Province.split(", ")[1]
 				if (Object.keys(states).includes(stateTable[state])) {
 					states[stateTable[state]].push({
-						location: results[i].Province.split(", ")[0],
-						date: results[i].Date,
-						deaths: results[i].Cases
+						location: initialObject[i].Province.split(", ")[0],
+						date: initialObject[i].Date,
+						deaths: initialObject[i].Cases
 					})
 				} else {
 					states[stateTable[state]] = []
 					states[stateTable[state]].push({
-						location: results[i].Province.split(", ")[0],
-						date: results[i].Date,
-						deaths: results[i].Cases
+						location: initialObject[i].Province.split(", ")[0],
+						date: initialObject[i].Date,
+						deaths: initialObject[i].Cases
 					})
 				}
 			} else {
 			// Only state name is specified.
-				let state = results[i].Province
+				let state = initialObject[i].Province
 				if (Object.keys(states).includes(state)) {
 					states[state].push({
-						date: results[i].Date,
-						deaths: results[i].Cases
+						date: initialObject[i].Date,
+						deaths: initialObject[i].Cases
 					})
 				} else {
 					states[state] = []
 					states[state].push({
-						date: results[i].Date,
-						deaths: results[i].Cases
+						date: initialObject[i].Date,
+						deaths: initialObject[i].Cases
 					})
 				}
 			}
 		}
+		return states;
+	}
 
-		this.setState({
-			states
-		})
-
+	countTheDead = (states) => {
+		let totalDeaths = 0;
 		for (const state in states) {
 			const stateSize = states[state].length
 			const theDead = states[state][stateSize - 1].deaths
@@ -88,30 +86,34 @@ class App extends Component {
 			totalDeaths = totalDeaths + theDead
 			console.log(state, ":", theDead, theTime)
 		}
-		this.setState({dead: totalDeaths})
 		console.log("Total Deaths: ", totalDeaths)
-debugger
-	} // end of accessData()
+		return totalDeaths;
+	}
 
 	getData = () => {
 	// Get List Of Cases Per Country Per Province By Case Type From The First 
-	// Recorded Case - status must be confirmed, recovered, or deaths
-		fetch("https://api.covid19api.com/dayone/country/us/status/deaths")
-		.then(resp => resp.json())
-		.then(json => {
-			if (json) {
-				this.setState({ data: {...json}, in: "success" })
-			} else {
-				this.setState({in: "failure"})
-			}
-		})
+	// Recorded Case With Live Count - status: confirmed, recovered, or deaths
+		fetch("https://api.covid19api.com/live/country/us/status/deaths")
+			.then(resp => resp.json())
+			.then(json => {
+				if (json) {
+					this.setState({ data: {...json}, in: "success" })
+				} else {
+					this.setState({in: "failure"})
+				}
+			})
 	//root API
 		fetch("https://api.covid19api.com/")
 			.then(resp => resp.json())
 			.then(json => {
 				this.setState({ main: {...json} })
 			})
-	}
+		fetch("https://api.covid19api.com/countries")
+			.then(resp => resp.json())
+			.then(json => {
+				this.setState({ countries: {...json}})
+			})
+	} // end of getData()
 
 	showDownload = () => {
 		switch (this.state.in) {
@@ -126,8 +128,18 @@ debugger
 		}
 	}
 
-	showState = () => {
-		console.log(this.state)
+	topTest = (results) => {
+		let testing = this.countTheDead(results)
+		console.log("THE FINAL TESTINGDERP!", testing)
+
+	}
+
+
+	bottomTest = () => {
+		const results = this.state.data
+		const states = this.processData(results)
+		this.setState({ states })
+		console.log("processData: ", states)
 	}
 
 	render() {
@@ -137,7 +149,7 @@ debugger
 					COVID-19 | {this.state.dead} American Fatalities
 				</header>
 				<main>
-					<button onClick={() => this.accessData()}>
+					<button onClick={() => this.topTest(this.state.states)}>
 						- ? -
 					</button>
 					
@@ -155,7 +167,7 @@ debugger
 					- Dr. Deborah Birx<br/>White House Coronavirus Response Coordinator, 
 					3/19/20
 					<br/><p/>
-					<button onClick={() => this.showState()}>
+					<button onClick={() => this.bottomTest()}>
 						- ! -
 					</button>
 				</main>
