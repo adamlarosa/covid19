@@ -5,7 +5,6 @@ class App extends Component {
 	constructor() {
 		super();
 		this.state = {
-			data: {},
 			main: {},
 			in: "waiting",
 			dead: 0,
@@ -81,39 +80,42 @@ class App extends Component {
 		for (const state in states) {
 			const stateSize = states[state].length
 			const theDead = states[state][stateSize - 1].deaths
-			const theTime = states[state][stateSize - 1].date
-
 			totalDeaths = totalDeaths + theDead
-			console.log(state, ":", theDead, theTime)
 		}
-		console.log("Total Deaths: ", totalDeaths)
 		return totalDeaths;
 	}
 
 	getData = () => {
+		const { countTheDead, processData } = this
 	// Get List Of Cases Per Country Per Province By Case Type From The First 
 	// Recorded Case With Live Count - status: confirmed, recovered, or deaths
 		fetch("https://api.covid19api.com/live/country/us/status/deaths")
+								// switch between "live" and "dayone"
 			.then(resp => resp.json())
 			.then(json => {
 				if (json) {
-					this.setState({ data: {...json}, in: "success" })
+					this.setState({ 
+						in: "success",
+						states: processData(json),
+						dead:  countTheDead(processData(json))
+					})
 				} else {
 					this.setState({in: "failure"})
 				}
 			})
-	//root API
+	// root API
 		fetch("https://api.covid19api.com/")
 			.then(resp => resp.json())
 			.then(json => {
 				this.setState({ main: {...json} })
 			})
+	// list of countries and slugs
 		fetch("https://api.covid19api.com/countries")
 			.then(resp => resp.json())
 			.then(json => {
 				this.setState({ countries: {...json}})
 			})
-	} // end of getData()
+	}
 
 	showDownload = () => {
 		switch (this.state.in) {
@@ -128,18 +130,16 @@ class App extends Component {
 		}
 	}
 
-	topTest = (results) => {
-		let testing = this.countTheDead(results)
-		console.log("THE FINAL TESTINGDERP!", testing)
-
+	topTest = (states) => {
+		console.log("App State: ", this.state)
 	}
 
-
 	bottomTest = () => {
-		const results = this.state.data
-		const states = this.processData(results)
-		this.setState({ states })
-		console.log("processData: ", states)
+		console.log("States Data: ", this.state.states)
+	}
+
+	handleChange = (e) => {
+		this.setState({selection: e.target.value})
 	}
 
 	render() {
@@ -163,13 +163,19 @@ class App extends Component {
 					that what they're doing today is more important than the health<br/> 
 					and welfare of the rest of Americans, they can spread the<br/> 
 					virus in a very strong way because you know the level of contagion. 
+					
 					<br/><p/>
+
 					- Dr. Deborah Birx<br/>White House Coronavirus Response Coordinator, 
 					3/19/20
+
 					<br/><p/>
+
 					<button onClick={() => this.bottomTest()}>
 						- ! -
 					</button>
+					
+					<br/><p/>
 				</main>
 			</div>
 		);
