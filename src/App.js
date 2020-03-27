@@ -9,13 +9,14 @@ class App extends Component {
 			main: {},
 			in: "waiting",
 			dead: 0,
+			confirmed: 0,
 			states : {},
 			countries: {},
-			slug: ""
+			slug: "us"
 		}
 	}
 	componentDidMount() { 
-		this.getData();
+		this.getData(this.state.slug);
 	}
 
 	processData = (initialObject) => {
@@ -70,11 +71,12 @@ class App extends Component {
 		return totalDeaths;
 	}
 
-	getData = () => {
+	getData = (slug) => {
+		this.setState({ in: "waiting" })
 		const { countTheDead, processData } = this
 	// Get List Of Cases Per Country Per Province By Case Type From The First 
 	// Recorded Case With Live Count - status: confirmed, recovered, or deaths
-		fetch("https://api.covid19api.com/live/country/us/status/deaths")
+		fetch(`https://api.covid19api.com/live/country/${slug}/status/deaths`)
 								// switch between "live" and "dayone"
 			.then(resp => resp.json())
 			.then(json => {
@@ -88,12 +90,19 @@ class App extends Component {
 					this.setState({ in: "failure" })
 				}
 			})
-	// root API
-		fetch("https://api.covid19api.com/")
+		fetch(`https://api.covid19api.com/live/country/${slug}/status/confirmed`)
 			.then(resp => resp.json())
 			.then(json => {
-				this.setState({ main: {...json} })
+				this.setState({
+					confirmed:  countTheDead(processData(json))
+				})
 			})
+	// // root API
+	// 	fetch("https://api.covid19api.com/")
+	// 		.then(resp => resp.json())
+	// 		.then(json => {
+	// 			this.setState({ main: {...json} })
+	// 		})
 	// list of countries and slugs
 		fetch("https://api.covid19api.com/countries")
 			.then(resp => resp.json())
@@ -117,7 +126,7 @@ class App extends Component {
 
 	formSubmit = (e) => {
 		e.preventDefault();
-		console.log(this.state.slug)
+		this.getData(this.state.slug)
 	}
 	selectSlug = (e) => {
 		this.setState({ slug: e.target.value})
@@ -135,9 +144,36 @@ class App extends Component {
 		return (
 			<div className="App">
 				<header className="App-header">
-					COVID-19 | {this.state.dead} American Fatalities
+				{this.state.confirmed} Confirmed | COVID-19 | {this.state.dead} Fatalities
 				</header>
 				<main>
+
+					<form>
+						<label>
+							<select 
+								value={this.state.value} 
+								onChange={(e) =>this.selectSlug(e)}
+							>
+								{Object.keys(this.state.countries).map((c,i) => {
+									return (
+										<option key={i}
+											value={this.state.countries[c].Slug}
+										>
+											{this.state.countries[c].Country}
+										</option>
+									)
+								})}	
+							</select>
+						</label>
+						<button
+							onClick={(e) => this.formSubmit(e)}
+							type="submit" 
+							value="Submit" 
+						>
+							select
+						</button>
+					</form>
+
 					<button onClick={() => this.topTest()}>
 						- ? -
 					</button>
@@ -170,29 +206,7 @@ class App extends Component {
 					<br/><p/>
 
 
-					<form>
-						<label>
-							<select 
-								value={this.state.value} 
-								onChange={(e) =>this.selectSlug(e)}
-							>
-								{Object.keys(this.state.countries).map((c,i) => {
-									return <option key={i}
-										value={this.state.countries[c].Slug}
-									>
-										{this.state.countries[c].Country}
-									</option>
-								})}	
-							</select>
-						</label>
-						<button
-							onClick={(e) => this.formSubmit(e)}
-							type="submit" 
-							value="Submit" 
-						>
-							select
-						</button>
-					</form>
+
 					
 					<br/><p/>
 
