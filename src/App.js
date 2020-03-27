@@ -80,7 +80,7 @@ class App extends Component {
 		for (const state in states) {
 			const stateSize = states[state].length
 			const theDead = states[state][stateSize - 1].deaths
-			totalDeaths = totalDeaths + theDead
+			totalDeaths += theDead
 		}
 		return totalDeaths;
 	}
@@ -100,7 +100,7 @@ class App extends Component {
 						dead:  countTheDead(processData(json))
 					})
 				} else {
-					this.setState({in: "failure"})
+					this.setState({ in: "failure" })
 				}
 			})
 	// root API
@@ -130,16 +130,12 @@ class App extends Component {
 		}
 	}
 
-	topTest = (states) => {
+	topTest = () => {
 		console.log("App State: ", this.state)
 	}
 
 	bottomTest = () => {
 		console.log("States Data: ", this.state.states)
-	}
-
-	handleChange = (e) => {
-		this.setState({selection: e.target.value})
 	}
 
 	render() {
@@ -149,7 +145,7 @@ class App extends Component {
 					COVID-19 | {this.state.dead} American Fatalities
 				</header>
 				<main>
-					<button onClick={() => this.topTest(this.state.states)}>
+					<button onClick={() => this.topTest()}>
 						- ? -
 					</button>
 					
