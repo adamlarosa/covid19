@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import stateTable from './States'
 import './App.css';
 
 class App extends Component {
@@ -17,29 +18,12 @@ class App extends Component {
 	}
 
 	processData = (initialObject) => {
-		const stateTable = {
-			AL: "Alabama", AK: "Alaska", AZ: "Arizona", AR: "Arkansas",
-			CA: "California", CO: "Colorado", CT: "Connecticut", DE: "Delaware",
-			FL: "Florida", GA: "Georgia", HI: "Hawaii", ID: "Idaho",
-			IL: "Illinois", IN: "Indiana", IA: "Iowa", KS: "Kansas",
-			KY: "Kentucky", LA: "Louisiana", ME: "Maine", MD: "Maryland",
-			MA: "Massachusetts", MI: "Michigan", MN: "Minnesota",
-			MS: "Mississippi", MO: "Missouri", MT: "Montana", NE: "Nebraska", 
-			NV: "Nevada", NH: "New Hampshire", NJ: "New Jersey", 
-			NM: "New Mexico", NY: "New York", NC: "North Carolina", 
-			ND: "North Dakota", OH: "Ohio", OK: "Oklahoma", OR: "Oregon", 
-			PA: "Pennsylvania", RI: "Rhode Island", SC: "South Carolina", 
-			SD: "South Dakota",	TN: "Tennessee", TX: "Texas", UT: "Utah", 
-			VT: "Vermont", VA: "Virginia", WA: "Washington", 
-			WV: "West Virginia", WI: "Wisconsin", WY: "Wyoming"	
-		};
-
 		const resultsSize = Object.keys(initialObject).length;
 		let states = {};
 
 		for (let i=0; i < resultsSize; i++){
-			// Province is split between state & county.
 			if (initialObject[i].Province.split(", ")[1]) {
+			// Province is split between state & county.
 				let state = initialObject[i].Province.split(", ")[1]
 				if (Object.keys(states).includes(stateTable[state])) {
 					states[stateTable[state]].push({
@@ -130,11 +114,19 @@ class App extends Component {
 		}
 	}
 
+	handleSubmit = () => {
+		console.log("Handle Submit")
+	}
+	handleChange = (e) => {
+		
+		console.log("handle change")
+	}
+
 	topTest = () => {
 		console.log("App State: ", this.state)
 	}
 
-	bottomTest = () => {
+	bottomTest = () => {	
 		console.log("States Data: ", this.state.states)
 	}
 
@@ -155,15 +147,18 @@ class App extends Component {
 					
 					<br/><p/>
 
-					...but if even ten or fifteen percent of the population decides<br/> 
-					that what they're doing today is more important than the health<br/> 
-					and welfare of the rest of Americans, they can spread the<br/> 
-					virus in a very strong way because you know the level of contagion. 
+					<div className="quote">
+						...but if even ten or fifteen percent of the population decides<br/> 
+						that what they're doing today is more important than the health<br/> 
+						and welfare of the rest of Americans, they can spread the<br/> 
+						virus in a very strong way because you know the level of contagion. 
 					
-					<br/><p/>
-
-					- Dr. Deborah Birx<br/>White House Coronavirus Response Coordinator, 
-					3/19/20
+						<br/><p/>
+						<div id="author" className="quote">
+							- Dr. Deborah Birx<br/>White House Coronavirus Response Coordinator, 
+							3/19/20
+						</div>
+					</div>
 
 					<br/><p/>
 
@@ -172,6 +167,26 @@ class App extends Component {
 					</button>
 					
 					<br/><p/>
+
+
+					<form onSubmit={this.handleSubmit}>
+						<label>
+							
+							{/* <select value={this.state.value} onChange={this.handleChange}>
+								{this.state.countries.map((country) => {
+
+									<option value={country}>{country}</option>
+								})}
+								
+								
+								<option value="grapefruit">Grapefruit</option>
+								
+							</select> */}
+						</label>
+						<input type="submit" value="Submit" />
+					</form>
+
+
 				</main>
 			</div>
 		);
