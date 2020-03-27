@@ -10,7 +10,8 @@ class App extends Component {
 			in: "waiting",
 			dead: 0,
 			states : {},
-			countries: {}
+			countries: {},
+			slug: ""
 		}
 	}
 	componentDidMount() { 
@@ -114,12 +115,12 @@ class App extends Component {
 		}
 	}
 
-	handleSubmit = () => {
-		console.log("Handle Submit")
+	formSubmit = (e) => {
+		e.preventDefault();
+		console.log(this.state.slug)
 	}
-	handleChange = (e) => {
-		
-		console.log("handle change")
+	selectSlug = (e) => {
+		this.setState({ slug: e.target.value})
 	}
 
 	topTest = () => {
@@ -169,23 +170,31 @@ class App extends Component {
 					<br/><p/>
 
 
-					<form onSubmit={this.handleSubmit}>
+					<form>
 						<label>
-							
-							{/* <select value={this.state.value} onChange={this.handleChange}>
-								{this.state.countries.map((country) => {
-
-									<option value={country}>{country}</option>
-								})}
-								
-								
-								<option value="grapefruit">Grapefruit</option>
-								
-							</select> */}
+							<select 
+								value={this.state.value} 
+								onChange={(e) =>this.selectSlug(e)}
+							>
+								{Object.keys(this.state.countries).map((c,i) => {
+									return <option key={i}
+										value={this.state.countries[c].Slug}
+									>
+										{this.state.countries[c].Country}
+									</option>
+								})}	
+							</select>
 						</label>
-						<input type="submit" value="Submit" />
+						<button
+							onClick={(e) => this.formSubmit(e)}
+							type="submit" 
+							value="Submit" 
+						>
+							select
+						</button>
 					</form>
-
+					
+					<br/><p/>
 
 				</main>
 			</div>
