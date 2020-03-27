@@ -6,7 +6,6 @@ class App extends Component {
 	constructor() {
 		super();
 		this.state = {
-			main: {},
 			in: "waiting",
 			dead: 0,
 			confirmed: 0,
@@ -128,10 +127,10 @@ class App extends Component {
 		e.preventDefault();
 		this.getData(this.state.slug)
 	}
-	selectSlug = (e) => {
+	selectCountry = (e) => {
 		this.setState({ slug: e.target.value})
 	}
-
+   
 	topTest = () => {
 		console.log("App State: ", this.state)
 	}
@@ -152,11 +151,12 @@ class App extends Component {
 						<label>
 							<select 
 								value={this.state.value} 
-								onChange={(e) =>this.selectSlug(e)}
+								onChange={(e) =>this.selectCountry(e)}
 							>
 								{Object.keys(this.state.countries).map((c,i) => {
 									return (
-										<option key={i}
+										<option 
+											key={i}
 											value={this.state.countries[c].Slug}
 										>
 											{this.state.countries[c].Country}
