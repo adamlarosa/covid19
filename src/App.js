@@ -18,41 +18,41 @@ class App extends Component {
 		this.getData(this.state.slug);
 	}
 
-	processData = (initialObject) => {
-		const resultsSize = Object.keys(initialObject).length;
-		let states = {};
+	processData = (results) => {
 
-		for (let i=0; i < resultsSize; i++){
-			if (initialObject[i].Province.split(", ")[1]) {
+		let states = {};
+		for (const result in results){
+			const info = results[result];
+			if (info.Province.split(", ")[1]) {
 			// Province is split between state & county.
-				let state = initialObject[i].Province.split(", ")[1]
+				let state = info.Province.split(", ")[1]
 				if (Object.keys(states).includes(stateTable[state])) {
 					states[stateTable[state]].push({
-						location: initialObject[i].Province.split(", ")[0],
-						date: initialObject[i].Date,
-						deaths: initialObject[i].Cases
+						location: info.Province.split(", ")[0],
+						date: info.Date,
+						deaths: info.Cases
 					})
 				} else {
 					states[stateTable[state]] = []
 					states[stateTable[state]].push({
-						location: initialObject[i].Province.split(", ")[0],
-						date: initialObject[i].Date,
-						deaths: initialObject[i].Cases
+						location: info.Province.split(", ")[0],
+						date: info.Date,
+						deaths: info.Cases
 					})
 				}
 			} else {
 			// Only state name is specified.
-				let state = initialObject[i].Province
+				let state = info.Province
 				if (Object.keys(states).includes(state)) {
 					states[state].push({
-						date: initialObject[i].Date,
-						deaths: initialObject[i].Cases
+						date: info.Date,
+						deaths: info.Deaths
 					})
 				} else {
 					states[state] = []
 					states[state].push({
-						date: initialObject[i].Date,
-						deaths: initialObject[i].Cases
+						date: info.Date,
+						deaths: info.Deaths
 					})
 				}
 			}
@@ -60,22 +60,23 @@ class App extends Component {
 		return states;
 	}
 
-	countTheDead = (states) => {
-		let totalDeaths = 0;
+	countCases = (states) => {
+		let totalCases = 0;
 		for (const state in states) {
 			const stateSize = states[state].length
-			const theDead = states[state][stateSize - 1].deaths
-			totalDeaths += theDead
+			const cases = states[state][stateSize - 1].deaths
+			totalCases += cases
 		}
-		return totalDeaths;
+		return totalCases;
 	}
 
 	getData = (slug) => {
 		this.setState({ in: "waiting" })
-		const { countTheDead, processData } = this
+		const { countCases, processData } = this
 	// Get List Of Cases Per Country Per Province By Case Type From The First 
 	// Recorded Case With Live Count - status: confirmed, recovered, or deaths
-		fetch(`https://api.covid19api.com/live/country/${slug}/status/deaths`)
+		//fetch(`https://api.covid19api.com/live/country/${slug}/status/deaths`)
+		fetch(`https://api.covid19api.com/dayone/country/${slug}/status/deaths/live`)
 								// switch between "live" and "dayone"
 			.then(resp => resp.json())
 			.then(json => {
@@ -83,7 +84,7 @@ class App extends Component {
 					this.setState({ 
 						in: "success",
 						states: processData(json),
-						dead:  countTheDead(processData(json))
+						dead:  countCases(processData(json))
 					})
 				} else {
 					this.setState({ in: "failure" })
@@ -93,7 +94,7 @@ class App extends Component {
 			.then(resp => resp.json())
 			.then(json => {
 				this.setState({
-					confirmed:  countTheDead(processData(json))
+					confirmed:  countCases(processData(json))
 				})
 			})
 	// // root API
@@ -102,8 +103,8 @@ class App extends Component {
 	// 		.then(json => {
 	// 			this.setState({ main: {...json} })
 	// 		})
-	// list of countries and slugs
 		fetch("https://api.covid19api.com/countries")
+	// list of countries and slugs
 			.then(resp => resp.json())
 			.then(json => {
 				this.setState({ countries: {...json}})
@@ -115,7 +116,7 @@ class App extends Component {
 			case "waiting" :
 				return "waiting for data";
 			case "success" :
-				return "download complete";
+				return "";
 			case "failure":
 				return "download failed";
 			default :
@@ -123,12 +124,12 @@ class App extends Component {
 		}
 	}
 
+	selectCountry = (e) => {
+		this.setState({slug: e.target.value})
+	}
 	formSubmit = (e) => {
 		e.preventDefault();
 		this.getData(this.state.slug)
-	}
-	selectCountry = (e) => {
-		this.setState({ slug: e.target.value})
 	}
    
 	topTest = () => {
@@ -148,23 +149,25 @@ class App extends Component {
 				<main>
 
 					<form>
-						<label>
-							<select 
-								value={this.state.value} 
-								onChange={(e) =>this.selectCountry(e)}
-							>
-								{Object.keys(this.state.countries).map((c,i) => {
-									return (
-										<option 
-											key={i}
-											value={this.state.countries[c].Slug}
-										>
-											{this.state.countries[c].Country}
-										</option>
-									)
-								})}	
-							</select>
-						</label>
+						<select 
+							value={this.state.slug} 
+							onChange={(e) =>this.selectCountry(e)}
+						>
+							{Object.keys(this.state.countries).map((c,i) => {
+								return (
+									<option
+										key={i}
+										value={this.state.countries[c].Slug}
+									>
+										{this.state.countries[c].Country === "US" ?
+											"United States"
+										:
+											this.state.countries[c].Country
+										}
+									</option>
+								)
+							})}	
+						</select>
 						<button
 							onClick={(e) => this.formSubmit(e)}
 							type="submit" 
@@ -181,8 +184,6 @@ class App extends Component {
 					<br/>
 					
 					{this.showDownload()} 
-					
-					<br/><p/>
 
 					<div className="quote">
 						...but if even ten or fifteen percent of the population decides<br/> 
@@ -197,7 +198,7 @@ class App extends Component {
 						</div>
 					</div>
 
-					<br/><p/>
+					{/* <br/><p/> */}
 
 					<button onClick={() => this.bottomTest()}>
 						- ! -
