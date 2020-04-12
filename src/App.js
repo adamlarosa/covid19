@@ -128,9 +128,10 @@ class App extends Component {
    
 	topTest = (input) => {
 		for (const state in input) {
-			for (const city in state) {
-				const lastEntry = city.length - 1
-				console.log (state.city[lastEntry])
+			for (const city in input[state]) {
+				const lastEntry = input[state][city].length - 1
+				console.log (state, city, input[state][city][lastEntry].cases)
+				
 			}
 		}
 	}
