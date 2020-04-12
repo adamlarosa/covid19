@@ -14,5 +14,4 @@ const stateTable = {
     VT: "Vermont", VA: "Virginia", WA: "Washington", 
     WV: "West Virginia", WI: "Wisconsin", WY: "Wyoming"	
 };
-
 export default { stateTable }

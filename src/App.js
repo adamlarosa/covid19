@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import stateTable from './States'
+//import stateTable from './States'
 import './App.css';
 
 class App extends Component {
@@ -8,6 +8,7 @@ class App extends Component {
 		this.state = {
 			in: "waiting",
 			dead: 0,
+			sick: {},
 			confirmed: 0,
 			states : {},
 			countries: {},
@@ -18,44 +19,37 @@ class App extends Component {
 		this.getData(this.state.slug);
 	}
 
-	processData = (results) => {
 
+
+
+	processData = (results) => {
 		let states = {};
 		for (const result in results){
 			const info = results[result];
-			if (info.Province.split(", ")[1]) {
-			// Province is split between state & county.
-				let state = info.Province.split(", ")[1]
-				if (Object.keys(states).includes(stateTable[state])) {
-					states[stateTable[state]].push({
-						location: info.Province.split(", ")[0],
+			const state = info.Province
+			const city = info.City
+			if (Object.keys(states).includes(state)) {
+				if (Object.keys(states[state]).includes(city)) {
+					states[state][city].push({
 						date: info.Date,
-						deaths: info.Cases
+						cases: info.Cases
 					})
 				} else {
-					states[stateTable[state]] = []
-					states[stateTable[state]].push({
-						location: info.Province.split(", ")[0],
+					states[state][city] = []
+					states[state][city].push({
 						date: info.Date,
-						deaths: info.Cases
+						cases: info.Cases
 					})
 				}
 			} else {
-			// Only state name is specified.
-				let state = info.Province
-				if (Object.keys(states).includes(state)) {
-					states[state].push({
-						date: info.Date,
-						deaths: info.Deaths
-					})
-				} else {
-					states[state] = []
-					states[state].push({
-						date: info.Date,
-						deaths: info.Deaths
-					})
-				}
+				states[state] = {}
+				states[state][city] = []
+				states[state][city].push({
+					date: info.Date,
+					cases: info.Cases
+				})
 			}
+			
 		}
 		return states;
 	}
@@ -63,14 +57,16 @@ class App extends Component {
 	countCases = (states) => {
 		let totalCases = 0;
 		for (const state in states) {
-			const stateSize = states[state].length
-			const cases = states[state][stateSize - 1].deaths
-			totalCases += cases
+			for (const city in states[state]) {
+				const array_size = states[state][city].length - 1
+				totalCases += states[state][city][array_size].cases
+			}
 		}
 		return totalCases;
 	}
 
 	getData = (slug) => {
+		// const { states } = this.state 
 		this.setState({ in: "waiting" })
 		const { countCases, processData } = this
 	// Get List Of Cases Per Country Per Province By Case Type From The First 
@@ -90,19 +86,20 @@ class App extends Component {
 					this.setState({ in: "failure" })
 				}
 			})
-		fetch(`https://api.covid19api.com/live/country/${slug}/status/confirmed`)
+		fetch(`https://api.covid19api.com/dayone/country/${slug}/status/confirmed/live`)
 			.then(resp => resp.json())
 			.then(json => {
 				this.setState({
+					sick: processData(json),
 					confirmed:  countCases(processData(json))
 				})
 			})
 	// // root API
-	// 	fetch("https://api.covid19api.com/")
-	// 		.then(resp => resp.json())
-	// 		.then(json => {
-	// 			this.setState({ main: {...json} })
-	// 		})
+		fetch("https://api.covid19api.com/")
+			.then(resp => resp.json())
+			.then(json => {
+				this.setState({ main: {...json} })
+			})
 		fetch("https://api.covid19api.com/countries")
 	// list of countries and slugs
 			.then(resp => resp.json())
@@ -133,11 +130,11 @@ class App extends Component {
 	}
    
 	topTest = () => {
-		console.log("App State: ", this.state)
+		console.log("debugging tool")
 	}
 
 	bottomTest = () => {	
-		console.log("States Data: ", this.state.states)
+		console.log("App State: ", this.state)
 	}
 
 	render() {
@@ -159,11 +156,7 @@ class App extends Component {
 										key={i}
 										value={this.state.countries[c].Slug}
 									>
-										{this.state.countries[c].Country === "US" ?
-											"United States"
-										:
-											this.state.countries[c].Country
-										}
+										{this.state.countries[c].Country}
 									</option>
 								)
 							})}	
