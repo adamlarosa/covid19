@@ -1,1 +1,1 @@
-Fun with a COVID19 api.
+Fun with a COVID19 api, buttons for debugging.
