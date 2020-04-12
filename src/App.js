@@ -19,9 +19,6 @@ class App extends Component {
 		this.getData(this.state.slug);
 	}
 
-
-
-
 	processData = (results) => {
 		let states = {};
 		for (const result in results){
@@ -129,8 +126,13 @@ class App extends Component {
 		this.getData(this.state.slug)
 	}
    
-	topTest = () => {
-		console.log("debugging tool")
+	topTest = (input) => {
+		for (const state in input) {
+			for (const city in state) {
+				const lastEntry = city.length - 1
+				console.log (state.city[lastEntry])
+			}
+		}
 	}
 
 	bottomTest = () => {	
@@ -170,7 +172,7 @@ class App extends Component {
 						</button>
 					</form>
 
-					<button onClick={() => this.topTest()}>
+					<button onClick={() => this.topTest(this.state.states)}>
 						- ? -
 					</button>
 					
