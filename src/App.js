@@ -130,8 +130,9 @@ class App extends Component {
 		for (const state in input) {
 			for (const city in input[state]) {
 				const lastEntry = input[state][city].length - 1
-				console.log (state, city, input[state][city][lastEntry].cases)
-				
+				if (input[state][city][lastEntry].cases !== 0) {
+					console.log (state, city, input[state][city][lastEntry].cases)
+				}
 			}
 		}
 	}
