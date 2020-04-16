@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 //import stateTable from './States'
 import './App.css';
 
+let renderCount = 1
+
 class App extends Component {
 	constructor() {
 		super();
@@ -18,6 +20,12 @@ class App extends Component {
 	componentDidMount() { 
 		this.getData(this.state.slug);
 	}
+
+	renderLog = () => {
+		console.log("render", renderCount)
+		renderCount++;
+	}
+
 
 	processData = (results) => {
 		let states = {};
@@ -142,6 +150,7 @@ class App extends Component {
 	}
 
 	render() {
+		this.renderLog();
 		return (
 			<div className="App">
 				<header className="App-header">
