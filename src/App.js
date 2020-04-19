@@ -198,24 +198,17 @@ class App extends Component {
 						virus in a very strong way because you know the level of contagion. 
 					
 						<br/><p/>
+
 						<div id="author" className="quote">
 							- Dr. Deborah Birx<br/>White House Coronavirus Response Coordinator, 
 							3/19/20
 						</div>
 					</div>
 
-					{/* <br/><p/> */}
-
 					<button onClick={() => this.bottomTest()}>
 						- ! -
 					</button>
 					
-					<br/><p/>
-
-
-
-					
-					<br/><p/>
 
 				</main>
 			</div>
