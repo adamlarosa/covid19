@@ -149,6 +149,10 @@ class App extends Component {
 		console.log("App State: ", this.state)
 	}
 
+	thirdTest = () => {
+		console.log("success")
+	}
+
 	render() {
 		this.renderLog();
 		return (
@@ -209,6 +213,9 @@ class App extends Component {
 						- ! -
 					</button>
 					
+					<button onClick={() => this.thirdTest()}>
+						- * -
+					</button>
 
 				</main>
 			</div>
