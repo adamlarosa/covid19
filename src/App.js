@@ -82,7 +82,6 @@ class App extends Component {
 			.then(resp => resp.json())
 			.then(json => {
 				if (json) {
-debugger
 					this.setState({ 
 						in: "success",
 						states: processData(json),
