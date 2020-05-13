@@ -77,11 +77,12 @@ class App extends Component {
 	// Get List Of Cases Per Country Per Province By Case Type From The First 
 	// Recorded Case With Live Count - status: confirmed, recovered, or deaths
 		//fetch(`https://api.covid19api.com/live/country/${slug}/status/deaths`)
-		fetch(`https://api.covid19api.com/dayone/country/${slug}/status/deaths/live`)
+		fetch(`https://api.covid19api.com/dayone/country/${slug}`)
 								// switch between "live" and "dayone"
 			.then(resp => resp.json())
 			.then(json => {
 				if (json) {
+debugger
 					this.setState({ 
 						in: "success",
 						states: processData(json),
@@ -91,7 +92,7 @@ class App extends Component {
 					this.setState({ in: "failure" })
 				}
 			})
-		fetch(`https://api.covid19api.com/dayone/country/${slug}/status/confirmed/live`)
+		fetch(`https://api.covid19api.com/dayone/country/${slug}`)
 			.then(resp => resp.json())
 			.then(json => {
 				this.setState({
@@ -149,8 +150,8 @@ class App extends Component {
 		console.log("App State: ", this.state)
 	}
 
-	thirdTest = () => {
-		console.log("success")
+	thirdTest = (input) => {
+		console.log("success", input)
 	}
 
 	render() {
@@ -213,7 +214,7 @@ class App extends Component {
 						- ! -
 					</button>
 					
-					<button onClick={() => this.thirdTest()}>
+					<button onClick={() => this.thirdTest(this.state.states)}>
 						- * -
 					</button>
 
